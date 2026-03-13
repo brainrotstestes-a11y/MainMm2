@@ -1,0 +1,159 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player.PlayerGui)
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0,320,0,260)
+frame.Position = UDim2.new(0.5,-160,0.5,-130)
+frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+frame.Active = true
+frame.Draggable = true
+Instance.new("UICorner",frame)
+
+local top = Instance.new("Frame",frame)
+top.Size = UDim2.new(1,0,0,40)
+top.BackgroundColor3 = Color3.fromRGB(15,15,15)
+
+local title = Instance.new("TextLabel",top)
+title.Size = UDim2.new(1,-40,1,0)
+title.Position = UDim2.new(0,10,0,0)
+title.BackgroundTransparency = 1
+title.Text = "Hack Menu"
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+local close = Instance.new("TextButton",top)
+close.Size = UDim2.new(0,35,0,35)
+close.Position = UDim2.new(1,-38,0,2)
+close.Text = "X"
+close.BackgroundColor3 = Color3.fromRGB(200,50,50)
+close.TextColor3 = Color3.new(1,1,1)
+close.Font = Enum.Font.GothamBold
+close.TextSize = 18
+
+close.MouseButton1Click:Connect(function()
+	frame.Visible = false
+end)
+
+local open = Instance.new("TextButton",gui)
+open.Size = UDim2.new(0,120,0,35)
+open.Position = UDim2.new(0,10,0,10)
+open.Text = "Abrir Menu"
+open.BackgroundColor3 = Color3.fromRGB(0,170,255)
+open.TextColor3 = Color3.new(1,1,1)
+open.Font = Enum.Font.GothamBold
+open.TextSize = 16
+
+open.MouseButton1Click:Connect(function()
+	frame.Visible = true
+end)
+
+local speedBox = Instance.new("TextBox",frame)
+speedBox.Size = UDim2.new(0,200,0,35)
+speedBox.Position = UDim2.new(0,10,0,60)
+speedBox.PlaceholderText = "Speed"
+speedBox.Text = ""
+speedBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+speedBox.TextColor3 = Color3.new(1,1,1)
+
+local speedSend = Instance.new("TextButton",frame)
+speedSend.Size = UDim2.new(0,90,0,35)
+speedSend.Position = UDim2.new(0,220,0,60)
+speedSend.Text = "Send"
+speedSend.BackgroundColor3 = Color3.fromRGB(0,170,0)
+speedSend.TextColor3 = Color3.new(1,1,1)
+
+speedSend.MouseButton1Click:Connect(function()
+	local num = tonumber(speedBox.Text)
+	if num then
+		player.Character.Humanoid.WalkSpeed = num
+	end
+end)
+
+local jumpBox = Instance.new("TextBox",frame)
+jumpBox.Size = UDim2.new(0,200,0,35)
+jumpBox.Position = UDim2.new(0,10,0,110)
+jumpBox.PlaceholderText = "Jump"
+jumpBox.Text = ""
+jumpBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+jumpBox.TextColor3 = Color3.new(1,1,1)
+
+local jumpSend = Instance.new("TextButton",frame)
+jumpSend.Size = UDim2.new(0,90,0,35)
+jumpSend.Position = UDim2.new(0,220,0,110)
+jumpSend.Text = "Send"
+jumpSend.BackgroundColor3 = Color3.fromRGB(0,170,0)
+jumpSend.TextColor3 = Color3.new(1,1,1)
+
+jumpSend.MouseButton1Click:Connect(function()
+	local num = tonumber(jumpBox.Text)
+	if num then
+		player.Character.Humanoid.JumpPower = num
+	end
+end)
+
+local espButton = Instance.new("TextButton",frame)
+espButton.Size = UDim2.new(0,300,0,40)
+espButton.Position = UDim2.new(0,10,0,170)
+espButton.Text = "ESP OFF"
+espButton.BackgroundColor3 = Color3.fromRGB(80,0,0)
+espButton.TextColor3 = Color3.new(1,1,1)
+
+local esp = false
+local highlights = {}
+
+local function createESP(p,color)
+	if p ~= player then
+		local function apply(char)
+			local h = Instance.new("Highlight")
+			h.FillColor = color
+			h.OutlineColor = color
+			h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+			h.Parent = char
+			table.insert(highlights,h)
+		end
+		if p.Character then
+			apply(p.Character)
+		end
+		p.CharacterAdded:Connect(apply)
+	end
+end
+
+local function clearESP()
+	for _,v in pairs(highlights) do
+		if v then
+			v:Destroy()
+		end
+	end
+	highlights = {}
+end
+
+espButton.MouseButton1Click:Connect(function()
+	esp = not esp
+	if esp then
+		espButton.Text = "ESP ON"
+		espButton.BackgroundColor3 = Color3.fromRGB(0,120,0)
+
+		for _,p in pairs(Players:GetPlayers()) do
+			local role = ""
+			if p:FindFirstChild("Role") then
+				role = p.Role.Value
+			end
+
+			if role == "Assassino" or role == "Murder" then
+				createESP(p,Color3.fromRGB(255,0,0))
+			elseif role == "Policia" or role == "Police" then
+				createESP(p,Color3.fromRGB(0,0,255))
+			else
+				createESP(p,Color3.fromRGB(0,255,0))
+			end
+		end
+
+	else
+		espButton.Text = "ESP OFF"
+		espButton.BackgroundColor3 = Color3.fromRGB(80,0,0)
+		clearESP()
+	end
+end)
